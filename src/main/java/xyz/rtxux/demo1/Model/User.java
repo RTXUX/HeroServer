@@ -16,6 +16,34 @@ public class User {
     @JoinTable(name = "user_answered_question")
     private List<Question> answeredQuestions;
     private int capableOfPrize = 0;
+    private long lastTimestamp;
+    @Column(unique = true)
+    private String username;
+    private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public long getLastTimestamp() {
+        return lastTimestamp;
+    }
+
+    public void setLastTimestamp(long lastTimestamp) {
+        this.lastTimestamp = lastTimestamp;
+    }
 
     public User(String token, List<Question> currentQuestion) {
         this.token = token;

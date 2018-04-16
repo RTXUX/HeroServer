@@ -35,12 +35,12 @@ public class PrizeController {
         Optional<User> userOptional = userRepository.findById(jsonUser.getUid());
         User user;
         if (!userOptional.isPresent()) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         user = userOptional.get();
         if (!user.getToken().equals(jsonUser.getToken())) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         response.put("status", 0);

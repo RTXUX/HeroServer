@@ -37,12 +37,12 @@ public class QuestionController {
         Optional<User> userOptional = userRepository.findById(juser.getUid());
         User user;
         if (!userOptional.isPresent()) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         user = userOptional.get();
         if (!user.getToken().equals(juser.getToken())) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         if (prizeRepository.findAllAvailablePrize().size() == 0) {
@@ -50,8 +50,13 @@ public class QuestionController {
             return response;
         }
         List<Question> questions;
+        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 60) {
+            user.getCurrentQuestion().clear();
+            user = userRepository.save(user);
+        }
         if (!user.getCurrentQuestion().isEmpty()) {
             questions = user.getCurrentQuestion();
+
         } else {
             questions = questionRepository.getRandomQuestion(5);
             questions.add(questionRepository.findById(175).get());
@@ -76,6 +81,7 @@ public class QuestionController {
 
             }
             user.setCurrentQuestion(questions);
+            user.setLastTimestamp(Utils.getCurrentTimestamp());
         }
         List<JsonQuestion> jsonQuestions = new LinkedList<>();
         for (Question question : questions) {
@@ -85,8 +91,10 @@ public class QuestionController {
             jsonQuestion.setAnswers(question.getAnswers());
             jsonQuestions.add(jsonQuestion);
         }
-        userRepository.save(user);
+
+        user = userRepository.save(user);
         response.put("status", 0);
+        response.put("timestamp", user.getLastTimestamp());
         response.put("question", jsonQuestions);
         return response;
     }
@@ -101,21 +109,27 @@ public class QuestionController {
         Optional<User> userOptional = userRepository.findById(jsonAnswer.getUid());
         User user;
         if (!userOptional.isPresent()) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         user = userOptional.get();
         if (!user.getToken().equals(jsonAnswer.getToken())) {
-            response.put("status", -1);
+            response.put("status", 2);
             return response;
         }
         List<Question> questions = user.getCurrentQuestion();
         if (questions.isEmpty()) {
-            response.put("status", -1);
+            response.put("status", 6);
             return response;
         }
         if (jsonAnswer.getAnswers().size() != 6) {
-            response.put("status", -1);
+            response.put("status", 6);
+            return response;
+        }
+        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 60) {
+            response.put("status", 6);
+            user.getCurrentQuestion().clear();
+            user = userRepository.save(user);
             return response;
         }
         List<Integer> correct = new LinkedList<>();
@@ -135,7 +149,7 @@ public class QuestionController {
                 }
             }
             if (flag == 0) {
-                response.put("status", -1);
+                response.put("status", 6);
                 return response;
             }
         }
