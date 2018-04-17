@@ -9,9 +9,9 @@ import xyz.rtxux.demo1.DAO.AnswerRespository;
 import xyz.rtxux.demo1.DAO.PrizeRepository;
 import xyz.rtxux.demo1.DAO.QuestionRepository;
 import xyz.rtxux.demo1.DAO.UserRepository;
+import xyz.rtxux.demo1.JsonModel.*;
 import xyz.rtxux.demo1.Model.Question;
 import xyz.rtxux.demo1.Model.User;
-import xyz.rtxux.demo1.ReturnModel.*;
 import xyz.rtxux.demo1.Utils.Utils;
 
 import java.util.*;
@@ -50,7 +50,7 @@ public class QuestionController {
             return response;
         }
         List<Question> questions;
-        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 60) {
+        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 65) {
             user.getCurrentQuestion().clear();
             user = userRepository.save(user);
         }
@@ -58,8 +58,7 @@ public class QuestionController {
             questions = user.getCurrentQuestion();
 
         } else {
-            questions = questionRepository.getRandomQuestion(5);
-            questions.add(questionRepository.findById(175).get());
+            questions = questionRepository.getRandomQuestion(6);
             /*for (Question question:questions) {
                 if (user.getAnsweredQuestions().contains(question)) {
                     questions.remove(question);
@@ -126,8 +125,8 @@ public class QuestionController {
             response.put("status", 6);
             return response;
         }
-        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 60) {
-            response.put("status", 6);
+        if (Utils.getCurrentTimestamp() - user.getLastTimestamp() > 65) {
+            response.put("status", 3);
             user.getCurrentQuestion().clear();
             user = userRepository.save(user);
             return response;

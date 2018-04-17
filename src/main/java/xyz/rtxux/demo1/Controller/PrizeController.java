@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import xyz.rtxux.demo1.DAO.OwnedPrizeRepository;
 import xyz.rtxux.demo1.DAO.PrizeRepository;
 import xyz.rtxux.demo1.DAO.UserRepository;
+import xyz.rtxux.demo1.JsonModel.JsonUser;
 import xyz.rtxux.demo1.Model.OwnedPrize;
 import xyz.rtxux.demo1.Model.Prize;
 import xyz.rtxux.demo1.Model.User;
-import xyz.rtxux.demo1.ReturnModel.JsonUser;
-import xyz.rtxux.demo1.Utils.Utils;
 
 import java.util.*;
 
@@ -28,10 +27,6 @@ public class PrizeController {
     @RequestMapping(value = "/prize/list", method = RequestMethod.POST)
     private Map<String, Object> listPrize(@RequestBody JsonUser jsonUser) {
         Map<String, Object> response = new HashMap<>();
-        if (System.currentTimeMillis() / 1000L > Utils.getTimeBound()) {
-            response.put("status", 1);
-            return response;
-        }
         Optional<User> userOptional = userRepository.findById(jsonUser.getUid());
         User user;
         if (!userOptional.isPresent()) {
@@ -51,10 +46,6 @@ public class PrizeController {
     @RequestMapping(value = "/prize/get", method = RequestMethod.POST)
     Map<String, Object> getPrize(@RequestBody JsonUser jsonUser) {
         Map<String, Object> response = new HashMap<>();
-        if (System.currentTimeMillis() / 1000L > Utils.getTimeBound()) {
-            response.put("status", 1);
-            return response;
-        }
         Optional<User> userOptional = userRepository.findById(jsonUser.getUid());
         User user;
         if (!userOptional.isPresent()) {
@@ -99,10 +90,6 @@ public class PrizeController {
     @RequestMapping(value = "/prize/own", method = RequestMethod.POST)
     public Map<String, Object> getOwnedPrize(@RequestBody JsonUser jsonUser) {
         Map<String, Object> response = new HashMap<>();
-        if (System.currentTimeMillis() / 1000L > Utils.getTimeBound()) {
-            response.put("status", 1);
-            return response;
-        }
         Optional<User> userOptional = userRepository.findById(jsonUser.getUid());
         User user;
         if (!userOptional.isPresent()) {

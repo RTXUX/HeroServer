@@ -1,4 +1,4 @@
-package xyz.rtxux.demo1.ReturnModel;
+package xyz.rtxux.demo1.JsonModel;
 
 
 import java.util.List;

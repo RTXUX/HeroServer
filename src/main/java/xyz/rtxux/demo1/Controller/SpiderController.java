@@ -2,8 +2,6 @@ package xyz.rtxux.demo1.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.rtxux.demo1.DAO.AnswerRespository;
 import xyz.rtxux.demo1.DAO.QuestionRepository;
@@ -28,7 +26,7 @@ public class SpiderController {
     @Autowired
     private AnswerRespository answerRespository;
 
-    @RequestMapping(value = "/internal/spider", method = RequestMethod.POST)
+    //@RequestMapping(value = "/internal/spider", method = RequestMethod.POST)
     public String spider(@RequestBody String str) throws Exception {
         Pattern pattern = Pattern.compile("([0-9]+)、(.*)\\s*A：(.*)\\s*B：(.*)\\s*C：(.*)\\s*D：(.*)\\s*答案：(.*)", Pattern.MULTILINE);
 
@@ -77,7 +75,7 @@ public class SpiderController {
         return "Fuck";
     }
 
-    @RequestMapping(value = "/internal/spider2", method = RequestMethod.POST)
+    //@RequestMapping(value = "/internal/spider2", method = RequestMethod.POST)
     public String spider2(@RequestBody String str) {
         KXSpider kxSpider = new KXSpider();
         for (int i = 1; i < 7; i++) {

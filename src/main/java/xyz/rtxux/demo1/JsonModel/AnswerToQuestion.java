@@ -1,4 +1,4 @@
-package xyz.rtxux.demo1.ReturnModel;
+package xyz.rtxux.demo1.JsonModel;
 
 public class AnswerToQuestion {
     private int question_id;

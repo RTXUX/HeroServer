@@ -6,10 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.rtxux.demo1.DAO.UserRepository;
+import xyz.rtxux.demo1.JsonModel.JsonUser;
+import xyz.rtxux.demo1.JsonModel.Login;
+import xyz.rtxux.demo1.JsonModel.UserInfo;
+import xyz.rtxux.demo1.JsonModel.UserTransfer;
 import xyz.rtxux.demo1.Model.User;
-import xyz.rtxux.demo1.ReturnModel.JsonUser;
-import xyz.rtxux.demo1.ReturnModel.Login;
-import xyz.rtxux.demo1.ReturnModel.UserInfo;
 import xyz.rtxux.demo1.Utils.Utils;
 
 import java.util.HashMap;
@@ -25,10 +26,8 @@ public class UserController {
 
     @RequestMapping(value = "/auth/login", method = RequestMethod.GET)
     public Login login() {
-        if (System.currentTimeMillis() / 1000L > Utils.getTimeBound()) {
-            return new Login(1, 0, "");
-        }
         User user = new User(UUID.randomUUID().toString(), null);
+        user.setCapableOfPrize(100);
         user = userRepository.save(user);
         Login login = new Login(0, user.getId(), user.getToken());
         return login;
@@ -36,21 +35,20 @@ public class UserController {
 
     @RequestMapping(value = "/auth/login", method = RequestMethod.POST)
     public Login login(@RequestBody UserInfo userInfo) {
-        if (System.currentTimeMillis() / 1000L > Utils.getTimeBound()) {
-            return new Login(1, 0, "");
-        }
         Optional<User> userOptional = userRepository.findUserByUsernameIgnoreCase(userInfo.getUsername());
         if (!userOptional.isPresent()) {
             return new Login(2, 0, "");
         }
         User user = userOptional.get();
-        if (!user.getPassword().equals(userInfo.getPassword())) {
+        if (!user.getPassword().equals(Utils.Encrypt(userInfo.getPassword(), null))) {
             return new Login(2, 0, "");
         }
+        user.setCapableOfPrize(100);
         user.setToken(UUID.randomUUID().toString());
         user = userRepository.save(user);
         return new Login(0, user.getId(), user.getToken());
     }
+
     @RequestMapping("/get_time")
     public Map<String, Object> getTime() {
         Map<String, Object> response = new HashMap<>();
@@ -60,19 +58,18 @@ public class UserController {
     }
 
     @RequestMapping(value = "/auth/register", method = RequestMethod.POST)
-    public Map<String, Object> register(@RequestBody UserInfo userInfo) {
+    public Login register(@RequestBody UserInfo userInfo) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> userOptional = userRepository.findUserByUsernameIgnoreCase(userInfo.getUsername());
         if (userOptional.isPresent()) {
-            response.put("status", 7);
-            return response;
+            return new Login(7, 0, "");
         }
         User user = new User();
         user.setUsername(userInfo.getUsername());
-        user.setPassword(userInfo.getPassword());
+        user.setPassword(Utils.Encrypt(userInfo.getPassword(), null));
+        user.setToken(UUID.randomUUID().toString());
         user = userRepository.save(user);
-        response.put("status", 0);
-        return response;
+        return new Login(0, user.getId(), user.getToken());
     }
 
     @RequestMapping(value = "/auth/logout", method = RequestMethod.POST)
@@ -105,10 +102,39 @@ public class UserController {
         if (!user.getToken().equals(jsonUser.getToken())) {
             return new Login(2, 0, "");
         }
+
         user.setToken(UUID.randomUUID().toString());
         user = userRepository.save(user);
         return new Login(0, user.getId(), user.getToken());
 
+    }
+
+    @RequestMapping(value = "/auth/transfer", method = RequestMethod.POST)
+    public Map<String, Object> transfer(@RequestBody UserTransfer userTransfer) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> userOptional = userRepository.findById(userTransfer.getUid());
+        if (!userOptional.isPresent()) {
+            response.put("status", 2);
+            return response;
+        }
+        User user = userOptional.get();
+        if (!user.getToken().equals(userTransfer.getToken())) {
+            response.put("status", 2);
+            return response;
+        }
+        if (user.getUsername() != null) {
+            response.put("status", 7);
+            return response;
+        }
+        if (userRepository.findUserByUsernameIgnoreCase(userTransfer.getUsername()).isPresent()) {
+            response.put("status", 7);
+            return response;
+        }
+        user.setUsername(userTransfer.getUsername());
+        user.setPassword(Utils.Encrypt(userTransfer.getPassword(), null));
+        user = userRepository.save(user);
+        response.put("status", 0);
+        return response;
     }
 
 }
