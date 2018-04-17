@@ -64,7 +64,7 @@ public class PrizeController {
         List<Prize> prizes = prizeRepository.findAllAvailablePrize();
         Prize prize = xyz.rtxux.demo1.Utils.Utils.shotPrize(prizes);
         prize.setAmount(prize.getAmount() - 1);
-
+        prize = prizeRepository.save(prize);
         user.setCapableOfPrize(user.getCapableOfPrize() - 1);
         userRepository.save(user);
         List<OwnedPrize> ownedPrizes = ownedPrizeRepository.findOwnedPrizeByUid(user.getId());
