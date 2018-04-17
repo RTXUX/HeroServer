@@ -110,31 +110,26 @@ public class UserController {
     }
 
     @RequestMapping(value = "/auth/transfer", method = RequestMethod.POST)
-    public Map<String, Object> transfer(@RequestBody UserTransfer userTransfer) {
+    public Login transfer(@RequestBody UserTransfer userTransfer) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> userOptional = userRepository.findById(userTransfer.getUid());
         if (!userOptional.isPresent()) {
-            response.put("status", 2);
-            return response;
+            return new Login(2, 0, null);
         }
         User user = userOptional.get();
         if (!user.getToken().equals(userTransfer.getToken())) {
-            response.put("status", 2);
-            return response;
+            return new Login(2, 0, null);
         }
         if (user.getUsername() != null) {
-            response.put("status", 7);
-            return response;
+            return new Login(7, 0, null);
         }
         if (userRepository.findUserByUsernameIgnoreCase(userTransfer.getUsername()).isPresent()) {
-            response.put("status", 7);
-            return response;
+            return new Login(7, 0, null);
         }
         user.setUsername(userTransfer.getUsername());
         user.setPassword(Utils.Encrypt(userTransfer.getPassword(), null));
         user = userRepository.save(user);
-        response.put("status", 0);
-        return response;
+        return new Login(0, user.getId(), user.getToken());
     }
 
 }
